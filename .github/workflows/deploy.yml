@@ -36,7 +36,7 @@ jobs:
 
       # Step C: Clean install of dependencies
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       # Step D: (CI) Run Tests (if you have any)
       - name: Run Unit Tests

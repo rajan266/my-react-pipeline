@@ -1,8 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
+import { usePosts } from './usePost';
 
-test('renders learn react link', () => {
+jest.mock('./usePost', () => ({ usePosts: jest.fn() }));
+
+test('renders a loading state while posts are being fetched', () => {
+  usePosts.mockReturnValue({ isPending: true });
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByText('Loading.....')).toBeInTheDocument();
 });
