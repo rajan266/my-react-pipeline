@@ -1,11 +1,8 @@
-
-import './App.css';
+import React from "react";
 import { useQuery } from '@tanstack/react-query';
-import Child from './Child';
-import { usePosts } from './usePost';
+import { usePosts } from "./usePost";
 
-
-function App() {
+function Child(){
   const {data, isPending, isError, error} = usePosts();
   if (isPending) {
     return <p>Loading.....</p>
@@ -21,9 +18,7 @@ function App() {
           <li key={post.id}>{post.title}</li>
         ))}
       </ul>
-      <Child/>
     </div>
   );
 }
-
-export default App;
+export default Child
