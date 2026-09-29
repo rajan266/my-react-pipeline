@@ -1,0 +1,74 @@
+name: Deploy Webpack React App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  # ============================
+  # 1. CI & BUILD JOB
+  # ============================
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step A: Download your code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step B: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # Step C: Clean install of dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Step D: (CI) Run Tests (if you have any)
+      - name: Run Unit Tests
+        run: npm test
+        env:
+          CI: true
+
+      # Step E: (CI) Build the project
+      - name: Build Webpack Bundle
+        run: npm run build
+        env:
+          # Prevents Webpack / CRA from failing the build on minor lint warnings
+          CI: false
+
+      # Step F: Upload the 'build' folder (Webpack CRA default output)
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './build'
+
+  # ============================
+  # 2. CD DEPLOY JOB
+  # ============================
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
